@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  telegram-bot:
+    build: .
+    container_name: telegram-video-backup
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # Персистентное хранилище для временных файлов (опционально)
+      - ./temp:/tmp/telegram_videos
+      # Сессия Pyrogram
+      - ./sessions:/app/sessions
+    environment:
+      - TZ=${TIMEZONE:-Europe/Moscow}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Ограничения ресурсов для Raspberry Pi
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4096M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
